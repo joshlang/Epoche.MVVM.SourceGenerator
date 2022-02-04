@@ -121,7 +121,7 @@ class ClassPlan
         foreach (var fieldModel in model.FieldModels.Where(x => x.FactoryInitializeAttribute is not null))
         {
             var type = GetFactoryInitializeType(fieldModel);
-            if (constructorArgTypes.Contains(type)) { continue; }            
+            if (constructorArgTypes.Contains(type)) { continue; }
             plan.ConstructorArguments.Add(new ConstructorArg
             {
                 FullTypeName = type,
@@ -130,7 +130,7 @@ class ClassPlan
         }
         plan.ConstructorArgumentsByType = plan.ConstructorArguments.GroupBy(x => x.FullTypeName).ToDictionary(x => x.Key, x => x.ToList());
     }
-    static void SetupInjectedProperties(ClassModel model, ClassPlan plan) 
+    static void SetupInjectedProperties(ClassModel model, ClassPlan plan)
     {
         plan.InjectedPropertyPlans = model.InjectAttributes.Select(x => new InjectedPropertyPlan
         {
@@ -167,7 +167,7 @@ class ClassPlan
             TaskPropertyName = x.CommandAttribute.TaskName.NullIfEmpty(),
             ParameterFullTypeName = x.CommandParameterType.NullIfEmpty(),
             HasParameter = x.CommandParameterType.NullIfEmpty() is not null,
-            PropertyName = x.CommandAttribute.Name.NullIfEmpty() ?? $"{(x.MethodName.EndsWith("Async") ? x.MethodName : x.MethodName)}Command"
+            PropertyName = x.CommandAttribute.Name.NullIfEmpty() ?? $"{(x.MethodName.EndsWith("Async") ? x.MethodName.Substring(0, x.MethodName.Length - 5) : x.MethodName)}Command"
         };
         if (commandPlan.TaskPropertyName is null && x.CommandAttribute.UseDefaultTaskName)
         {
