@@ -167,7 +167,7 @@ class ClassPlan
             TaskPropertyName = x.CommandAttribute.TaskName.NullIfEmpty(),
             ParameterFullTypeName = x.CommandParameterType.NullIfEmpty(),
             HasParameter = x.CommandParameterType.NullIfEmpty() is not null,
-            PropertyName = x.CommandAttribute.Name.NullIfEmpty() ?? $"{x.MethodName}Command"
+            PropertyName = x.CommandAttribute.Name.NullIfEmpty() ?? $"{(x.MethodName.EndsWith("Async") ? x.MethodName : x.MethodName)}Command"
         };
         if (commandPlan.TaskPropertyName is null && x.CommandAttribute.UseDefaultTaskName)
         {
