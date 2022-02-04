@@ -92,13 +92,7 @@ class ClassPlan
         if (model.WithFactoryAttribute is not null)
         {
             plan.Factory.FactoryAccessModifier = model.WithFactoryAttribute.FactoryAccessModifier.NullIfEmpty();
-            plan.Factory.InterfaceAccessModifier = model.WithFactoryAttribute.InterfaceAccessModifier.NullIfEmpty() ?? "public";
             plan.Factory.FactoryName = model.WithFactoryAttribute.FactoryName.NullIfEmpty();
-            plan.Factory.InterfaceName = model.WithFactoryAttribute.InterfaceName.NullIfEmpty();
-            if (model.WithFactoryAttribute.UseInterfaceNameDefault)
-            {
-                plan.Factory.InterfaceName = $"I{model.ClassName}Factory";
-            }
             if (model.WithFactoryAttribute.UseFactoryNameDefault)
             {
                 plan.Factory.FactoryName = $"{model.ClassName}Factory";
@@ -127,16 +121,11 @@ class ClassPlan
         foreach (var fieldModel in model.FieldModels.Where(x => x.FactoryInitializeAttribute is not null))
         {
             var type = GetFactoryInitializeType(fieldModel);
-            if (constructorArgTypes.Contains(type)) { continue; }
-            var arg = new ConstructorArg
-            {
-                FullTypeName = type,
-                ArgumentName = fieldModel.TypeName.ToCamelCase()
-            };
+            if (constructorArgTypes.Contains(type)) { continue; }            
             plan.ConstructorArguments.Add(new ConstructorArg
             {
                 FullTypeName = type,
-                ArgumentName = type.NameWithoutInterface().NameWithoutGenerics().ToCamelCase()
+                ArgumentName = $"{fieldModel.TypeName.ToCamelCase()}Factory"
             });
         }
         plan.ConstructorArgumentsByType = plan.ConstructorArguments.GroupBy(x => x.FullTypeName).ToDictionary(x => x.Key, x => x.ToList());
@@ -159,13 +148,13 @@ class ClassPlan
                 plan.InjectedPropertyPlans.Add(new InjectedPropertyPlan
                 {
                     FullTypeName = factoryType,
-                    PropertyName = factoryType.NameWithoutInterface().NameWithoutGenerics(),
+                    PropertyName = $"{field.TypeName}Factory",
                     ConstructorArg = plan.ConstructorArgumentsByType[factoryType][0]
                 });
             }
         }
     }
-    static string GetFactoryInitializeType(FieldModel fieldModel) => fieldModel.FactoryInitializeAttribute!.Type.NullIfEmpty() ?? $"{(fieldModel.TypeNamespace is null ? "" : $"{fieldModel.TypeNamespace}.")}I{fieldModel.TypeName}Factory";
+    static string GetFactoryInitializeType(FieldModel fieldModel) => $"Epoche.MVVM.Models.IModelFactory<{fieldModel.FullTypeName}>";
     static void SetupCommands(ClassModel model, ClassPlan plan) => plan.CommandPlans = model.MethodModels.Where(x => x.CommandAttribute is not null).Select(x =>
     {
         var commandPlan = new CommandPlan
@@ -180,7 +169,6 @@ class ClassPlan
             HasParameter = x.CommandParameterType.NullIfEmpty() is not null,
             PropertyName = x.CommandAttribute.Name.NullIfEmpty() ?? $"{x.MethodName}Command"
         };
-        //            TaskFieldName = x.CommandAttribute.TaskName!.ToFieldName(),
         if (commandPlan.TaskPropertyName is null && x.CommandAttribute.UseDefaultTaskName)
         {
             commandPlan.TaskPropertyName = $"{commandPlan.PropertyName}Task";

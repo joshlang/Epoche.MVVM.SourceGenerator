@@ -8,8 +8,8 @@ static class ClassPlanWriter
     {
         outputPlan.CancellationToken.ThrowIfCancellationRequested();
 
+        var s = Class(plan);
         outputPlan.Context.AddSource($"{plan.ClassName}.g.cs", Class(plan));
-        FactoryInterfacePlanWriter.Write(outputPlan, plan);
         FactoryPlanWriter.Write(outputPlan, plan);
     }
 

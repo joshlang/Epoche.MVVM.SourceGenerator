@@ -50,9 +50,7 @@ sealed class FactoryInitializeAttribute : Attribute
 [AttributeUsage(AttributeTargets.Class)]
 sealed class WithFactoryAttribute : Attribute
 {
-    public string? InterfaceName { get; }
     public string? FactoryName { get; }
-    public string? InterfaceAccessModifier { get; }
     public string? FactoryAccessModifier { get; }
     public WithFactoryAttribute()
     {

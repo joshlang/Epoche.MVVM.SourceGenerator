@@ -15,7 +15,7 @@ class FactoryPlanWriter
     static string Factory(ClassPlan plan) => $@"
 #nullable enable
 namespace {plan.Namespace};
-{plan.Factory.FactoryAccessModifier.AddSpace()}class {plan.Factory.FactoryName}{(plan.Factory.InterfaceName is null ? "" : $" : {plan.Factory.FullInterfaceName}")}
+{plan.Factory.FactoryAccessModifier.AddSpace()}class {plan.Factory.FactoryName} : Epoche.MVVM.Models.IModelFactory<{plan.FullClassName}>
 {{
     public {plan.Factory.FactoryName}({string.Join(",", plan.ConstructorArguments.Select(ConstructorArg))})
     {{
