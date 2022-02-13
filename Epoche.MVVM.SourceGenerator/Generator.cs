@@ -1,6 +1,6 @@
 ﻿namespace Epoche.MVVM.SourceGenerator;
 
-[Generator]
+[Generator(LanguageNames.CSharp)]
 public class Generator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
