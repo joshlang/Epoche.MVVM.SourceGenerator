@@ -4,4 +4,5 @@ class FactoryInitializeAttributeModel
     public AttributeData AttributeData = default!;
 
     public string? Type;
+    public string? InitializeExpression;
 }

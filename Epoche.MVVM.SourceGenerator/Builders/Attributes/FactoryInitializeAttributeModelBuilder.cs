@@ -22,6 +22,9 @@ static class FactoryInitializeAttributeModelBuilder
                 case "Type":
                     model.Type = (named.Value.Value as ITypeSymbol)?.ToDisplayString()!;
                     break;
+                case "InitializeExpression":
+                    model.InitializeExpression = named.Value.Value as string;
+                    break;
             }
         }
 

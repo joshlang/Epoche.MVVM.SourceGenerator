@@ -24,7 +24,6 @@ static class FieldPropertyPlanWriter
                 cachedPropertyChangedEventArgs: Epoche.MVVM.CachedPropertyChangeEventArgs.{plan.PropertyName}))
             {{
                 {string.Concat(plan.AffectedProperties.Where(x => x != plan.PropertyName).Select(AffectedProperty)).Up()}
-                {string.Concat(plan.AffectedCommands.Select(AffectedCommand)).Up()}
             }}
         }}
     }}
@@ -33,11 +32,11 @@ static class FieldPropertyPlanWriter
     static string AffectedProperty(string propertyName) => $@"
                 this.RaisePropertyChanged(Epoche.MVVM.CachedPropertyChangeEventArgs.{propertyName});";
 
-    static string AffectedCommand(string commandName) => $@"
-                this.{commandName}.RaiseCanExecuteChanged();";
-
     public static string FactoryInitialize(ClassPlan plan) => string.Concat(plan.FieldPropertiesPlans.Select(FactoryInitialize));
+    public static string InitializeExpressions(ClassPlan plan) => string.Concat(plan.FieldPropertiesPlans.Select(InitializeExpressions));
 
     static string FactoryInitialize(ClassPlan.FieldPropertyPlan plan) => plan.FactoryConstructorArg is null ? "" : $@"
         this.{plan.FieldName} = {plan.FactoryConstructorArg.ArgumentName}?.Create() ?? throw new System.ArgumentNullException(nameof({plan.FactoryConstructorArg.ArgumentName}));";
+    static string InitializeExpressions(ClassPlan.FieldPropertyPlan plan) => plan.FactoryInitializerExpression is null ? "" : $@"
+        this.{plan.FieldName}.Initialize({plan.FactoryInitializerExpression});";
 }

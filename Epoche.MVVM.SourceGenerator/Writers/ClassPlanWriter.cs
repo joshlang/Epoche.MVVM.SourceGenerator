@@ -23,6 +23,7 @@ partial class {plan.ClassName}
         {FieldPropertyPlanWriter.FactoryInitialize(plan).Up()}
         {CommandPlanWriter.Create(plan)}
         {InjectedPropertyPlanWriter.Assign(plan)}
+        {FieldPropertyPlanWriter.InitializeExpressions(plan)}
         this.Init();
     }}
     

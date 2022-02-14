@@ -41,6 +41,7 @@ sealed class ChangedByAttribute : Attribute
 sealed class FactoryInitializeAttribute : Attribute
 {
     public Type? Type { get; set; }
+    public string? InitializeExpression { get; set; }
     public FactoryInitializeAttribute(Type? type = null)
     {
         Type = type;

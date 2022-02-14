@@ -9,10 +9,7 @@ class ClassPlan
 
     public class FactoryPlan
     {
-        public string? InterfaceName;
-        public string? FullInterfaceName;
         public string? FactoryName;
-        public string? InterfaceAccessModifier;
         public string? FactoryAccessModifier;
     }
     public FactoryPlan Factory = new();
@@ -62,9 +59,8 @@ class ClassPlan
         public string? EqualityComparer;
         public bool TrackChanges = true;
         public ConstructorArg? FactoryConstructorArg;
+        public string? FactoryInitializerExpression;
         public HashSet<string> AffectedProperties = new();
-#warning TODO
-        public HashSet<string> AffectedCommands = new();
     }
     public List<FieldPropertyPlan> FieldPropertiesPlans = default!;
 
@@ -97,7 +93,6 @@ class ClassPlan
             {
                 plan.Factory.FactoryName = $"{model.ClassName}Factory";
             }
-            plan.Factory.FullInterfaceName = plan.Factory.InterfaceName is null ? null : $"{plan.Namespace}.{plan.Factory.InterfaceName}";
         }
     }
     static void SetupConstructorArgs(ClassModel model, ClassPlan plan)
@@ -187,7 +182,8 @@ class ClassPlan
         EqualityComparer = x.PropertyAttribute.EqualityComparer.NullIfEmpty(),
         SetterModifier = x.PropertyAttribute.SetterModifier.NullIfEmpty(),
         TrackChanges = x.PropertyAttribute.TrackChanges,
-        FactoryConstructorArg = x.FactoryInitializeAttribute is null ? null : plan.ConstructorArgumentsByType[GetFactoryInitializeType(x)][0]
+        FactoryConstructorArg = x.FactoryInitializeAttribute is null ? null : plan.ConstructorArgumentsByType[GetFactoryInitializeType(x)][0],
+        FactoryInitializerExpression = x.FactoryInitializeAttribute?.InitializeExpression.NullIfEmpty()
     }).ToList();
 
     static void SetupChangeBy(ClassModel model, ClassPlan plan)
