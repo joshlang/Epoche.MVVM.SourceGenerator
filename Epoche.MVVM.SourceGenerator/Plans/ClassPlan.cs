@@ -168,6 +168,10 @@ class ClassPlan
         {
             commandPlan.TaskPropertyName = $"{commandPlan.PropertyName}Task";
         }
+        if (!commandPlan.IsAsync)
+        {
+            commandPlan.TaskPropertyName = null;
+        }
         commandPlan.TaskFieldName = commandPlan.TaskPropertyName?.ToFieldName();
         return commandPlan;
     }).ToList();

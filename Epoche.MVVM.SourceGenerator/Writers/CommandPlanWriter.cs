@@ -23,7 +23,7 @@ static class CommandPlanWriter
     public static string Create(ClassPlan plan) => string.Concat(plan.CommandPlans.Select(Create));
 
     static string Create(ClassPlan.CommandPlan plan) => $@"
-        this.{plan.PropertyName} = new({CreateCommandExecute(plan)},{CreateCanCommandExecute(plan)});
+        this.{plan.PropertyName} = new({CreateCommandExecute(plan)}, {CreateCanCommandExecute(plan)});
 ";
 
     static string CreateCommandExecute(ClassPlan.CommandPlan plan) =>
