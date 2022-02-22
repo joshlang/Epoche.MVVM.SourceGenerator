@@ -5,10 +5,9 @@
 		<LangVersion>latest</LangVersion>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<IsRoslynComponent>true</IsRoslynComponent>
-		
+		<IsRoslynComponent>true</IsRoslynComponent>		
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<Authors>joshlang2</Authors>
+		<Authors>Josh Lang</Authors>
 		<Description>Source generator used in conjunction with MVVM repo used internally by Epoche</Description>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/joshlang/Epoche.MVVM.SourceGenerator</RepositoryUrl>
@@ -17,7 +16,7 @@
 		<PackageId>Epoche.MVVM.SourceGenerator</PackageId>
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 		<PackageProjectUrl>https://github.com/joshlang/Epoche.MVVM.SourceGenerator</PackageProjectUrl>
-		<Version>1.0.5</Version>
+		<Version>1.0.6</Version>
 
 		<IncludeBuildOutput>false</IncludeBuildOutput>
 	</PropertyGroup>
