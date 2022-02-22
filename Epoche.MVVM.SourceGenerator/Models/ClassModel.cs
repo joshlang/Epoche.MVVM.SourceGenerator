@@ -5,6 +5,7 @@ class ClassModel
 {
     public string Namespace = default!;
     public string ClassName = default!;
+    public string[] GenericTypeArguments = default!;
 
     public bool IsMVVMModel;
     public bool IsMVVMViewModel;

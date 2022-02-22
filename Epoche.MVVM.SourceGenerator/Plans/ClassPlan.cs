@@ -6,6 +6,7 @@ class ClassPlan
     public string Namespace = default!;
     public string ClassName = default!;
     public string FullClassName = default!;
+    public string ClassDefinition = default!;
 
     public class FactoryPlan
     {
@@ -70,8 +71,13 @@ class ClassPlan
         {
             Namespace = model.Namespace,
             ClassName = model.ClassName,
-            FullClassName = $"{model.Namespace}.{model.ClassName}"
+            FullClassName = $"{model.Namespace}.{model.ClassName}",
+            ClassDefinition = model.ClassName
         };
+        if (model.GenericTypeArguments.Any())
+        {
+            plan.ClassDefinition += "<" + string.Join(", ", model.GenericTypeArguments) + ">";
+        }
 
         SetupFactory(model, plan);
         SetupConstructorArgs(model, plan);

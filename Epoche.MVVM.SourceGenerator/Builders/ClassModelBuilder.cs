@@ -18,6 +18,7 @@ static class ClassModelBuilder
         var semanticModel = outputModel.Compilation.GetSemanticModel(syntax.SyntaxTree);
         if (semanticModel.GetDeclaredSymbol(syntax) is not INamedTypeSymbol classSymbol) { return; }
 
+        model.GenericTypeArguments = classSymbol.TypeParameters.Select(x => x.Name).ToArray();
         model.Namespace = classSymbol.ContainingNamespace.ToDisplayString();
         model.ClassName = classSymbol.Name.ToString();
         model.IsMVVMModel = outputModel.ModelBaseSymbol is not null && classSymbol.IsClassDerivedFrom(outputModel.ModelBaseSymbol);

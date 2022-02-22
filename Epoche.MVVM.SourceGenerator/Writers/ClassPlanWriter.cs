@@ -16,7 +16,7 @@ static class ClassPlanWriter
     static string Class(ClassPlan plan) => $@"
 #nullable enable
 namespace {plan.Namespace};
-partial class {plan.ClassName}
+partial class {plan.ClassDefinition}
 {{
     public {plan.ClassName}({string.Join(",", plan.ConstructorArguments.Select(ConstructorArg))}){BaseArgs(plan)}
     {{

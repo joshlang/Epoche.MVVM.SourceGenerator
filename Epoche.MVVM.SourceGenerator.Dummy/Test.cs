@@ -11,7 +11,7 @@ namespace Epoche.MVVM.SourceGenerator.Dummy;
 
 
 [UseSourceGen]
-partial class Test: ViewModelBase
+partial class Test<T, U>: ViewModelBase
 {
     [Command]
     void Meow() { }
