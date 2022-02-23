@@ -7,6 +7,8 @@ class ClassPlan
     public string ClassName = default!;
     public string FullClassName = default!;
     public string ClassDefinition = default!;
+    public string? BaseClassDefinition;
+    public Dictionary<string, int> GenericTypeParameterIndexes = new();
 
     public class FactoryPlan
     {
@@ -65,14 +67,16 @@ class ClassPlan
     }
     public List<FieldPropertyPlan> FieldPropertiesPlans = default!;
 
-    public static ClassPlan Create(OutputModel outputModel, ClassModel model)
+    public static ClassPlan Create(OutputModel outputModel, ClassModel model, ClassPlan? baseClassPlan)
     {
         var plan = new ClassPlan
         {
             Namespace = model.Namespace,
             ClassName = model.ClassName,
             FullClassName = $"{model.Namespace}.{model.ClassName}",
-            ClassDefinition = model.ClassName
+            ClassDefinition = model.ClassName,
+            BaseClassDefinition = model.FullBaseClassName.NullIfEmpty(),
+            GenericTypeParameterIndexes = model.GenericTypeArguments.Select((x, i) => new { x, i }).ToDictionary(x => x.x, x => x.i)
         };
         if (model.GenericTypeArguments.Any())
         {
@@ -80,7 +84,7 @@ class ClassPlan
         }
 
         SetupFactory(model, plan);
-        SetupConstructorArgs(model, plan);
+        SetupConstructorArgs(model, plan, baseClassPlan);
         SetupInjectedProperties(model, plan);
         SetupCommands(model, plan);
         SetupFieldProperties(model, plan);
@@ -101,12 +105,41 @@ class ClassPlan
             }
         }
     }
-    static void SetupConstructorArgs(ClassModel model, ClassPlan plan)
+    static void SetupConstructorArgs(ClassModel model, ClassPlan plan, ClassPlan? baseClassPlan)
     {
         plan.BaseArguments = model.BaseConstructorArgs.Select(x => x.Name).ToList();
         var baseArgTypes = new HashSet<string>(model.BaseConstructorArgs.Select(x => x.FullTypeName));
 
         plan.ConstructorArguments = new();
+        if (baseClassPlan is not null)
+        {
+            plan.ConstructorArguments.AddRange(baseClassPlan.ConstructorArguments.Select(x =>
+            {
+                var arg = new ConstructorArg
+                {
+                    ArgumentName = x.ArgumentName,
+                    FullTypeName = x.FullTypeName
+                };
+                foreach (var kvp in baseClassPlan.GenericTypeParameterIndexes)
+                {
+                    var actual = model.BaseClassGenericTypeArguments[kvp.Value];
+                    if (arg.FullTypeName == kvp.Key)
+                        arg.FullTypeName = actual;
+                    else if (arg.FullTypeName.Contains(kvp.Key))
+                    {
+                        arg.FullTypeName = arg.FullTypeName
+                            .Replace($"<{kvp.Key}>", $"<{actual}>") // super ghetto
+                            .Replace($"<{kvp.Key},", $"<{actual},") // if it's a problem, write an actual
+                            .Replace($",{kvp.Key},", $",{actual},") // replacer that looks at all the
+                            .Replace($",{kvp.Key}>", $",{actual}>") // types and generic arguments
+                            .Replace($" {kvp.Key},", $" {actual},") // and generic generic arguments
+                            .Replace($" {kvp.Key}>", $" {actual}>"); // and generic generic generic arguments ... etc
+                    }
+                }
+                return arg;
+            }));
+            plan.BaseArguments.AddRange(baseClassPlan.ConstructorArguments.Select(x => x.ArgumentName));
+        }
         plan.ConstructorArguments.AddRange(model.BaseConstructorArgs.Select(x => new ConstructorArg
         {
             FullTypeName = x.FullTypeName,

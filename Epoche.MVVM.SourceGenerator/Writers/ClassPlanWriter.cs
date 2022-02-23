@@ -1,5 +1,4 @@
-﻿using Epoche.MVVM.SourceGenerator.Models;
-using Epoche.MVVM.SourceGenerator.Plans;
+﻿using Epoche.MVVM.SourceGenerator.Plans;
 
 namespace Epoche.MVVM.SourceGenerator.Writers;
 static class ClassPlanWriter
@@ -16,7 +15,7 @@ static class ClassPlanWriter
     static string Class(ClassPlan plan) => $@"
 #nullable enable
 namespace {plan.Namespace};
-partial class {plan.ClassDefinition}
+partial class {plan.ClassDefinition}{(plan.BaseClassDefinition is null ? "" : $" : {plan.BaseClassDefinition}")}
 {{
     public {plan.ClassName}({string.Join(",", plan.ConstructorArguments.Select(ConstructorArg))}){BaseArgs(plan)}
     {{

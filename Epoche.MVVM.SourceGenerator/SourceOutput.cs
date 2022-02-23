@@ -41,6 +41,7 @@ static class SourceOutput
         {
             ClassModelBuilder.Build(model, syntax!);
         }
+        ClassModelBuilder.Finish(model);
         var plan = OutputPlan.Create(model);
         OutputPlanWriter.Write(plan);
     }

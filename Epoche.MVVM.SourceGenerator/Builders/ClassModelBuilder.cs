@@ -23,6 +23,10 @@ static class ClassModelBuilder
         model.ClassName = classSymbol.Name.ToString();
         model.IsMVVMModel = outputModel.ModelBaseSymbol is not null && classSymbol.IsClassDerivedFrom(outputModel.ModelBaseSymbol);
         model.IsMVVMViewModel = model.IsMVVMModel && outputModel.ViewModelBaseSymbol is not null && classSymbol.IsClassDerivedFrom(outputModel.ViewModelBaseSymbol);
+        model.FullBaseClassName = classSymbol.BaseType?.ToDisplayString();
+        model.FullBaseClassNameWithoutGenerics = classSymbol.BaseType?.ToDisplayString().Split('<')[0];
+        model.BaseClassGenericTypeParameters = classSymbol.BaseType?.TypeParameters.Select(x => x.Name).ToArray() ?? Array.Empty<string>();
+        model.BaseClassGenericTypeArguments = classSymbol.BaseType?.TypeArguments.Select(x => x.ToDisplayString()).ToArray() ?? Array.Empty<string>();
 
         foreach (var attributeData in classSymbol.GetAttributes())
         {
@@ -77,7 +81,18 @@ static class ClassModelBuilder
             }
         }
 
-
         outputModel.Classes.Add(model);
+    }
+
+    public static void Finish(OutputModel outputModel)
+    {
+        var byType = outputModel.Classes.ToDictionary(x => $"{x.Namespace}.{x.ClassName}+{x.GenericTypeArguments.Length}");
+        foreach (var classModel in outputModel.Classes.Where(x => x.BaseConstructorArgs.Count == 0))
+        {
+            classModel.SourceGeneratedBaseClass =
+                byType.TryGetValue($"{classModel.FullBaseClassNameWithoutGenerics}+{classModel.BaseClassGenericTypeParameters.Length}", out var baseModel) ?
+                baseModel :
+                null;
+        }
     }
 }

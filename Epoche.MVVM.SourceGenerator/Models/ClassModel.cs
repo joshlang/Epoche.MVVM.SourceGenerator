@@ -6,6 +6,11 @@ class ClassModel
     public string Namespace = default!;
     public string ClassName = default!;
     public string[] GenericTypeArguments = default!;
+    public string? FullBaseClassNameWithoutGenerics;
+    public string? FullBaseClassName;
+    public string[] BaseClassGenericTypeParameters = default!;
+    public string[] BaseClassGenericTypeArguments = default!;
+    public ClassModel? SourceGeneratedBaseClass;
 
     public bool IsMVVMModel;
     public bool IsMVVMViewModel;

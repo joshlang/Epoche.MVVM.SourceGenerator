@@ -5,8 +5,8 @@ class OutputPlan
 {
     public CancellationToken CancellationToken;
     public SourceProductionContext Context;
-    public List<ClassPlan> ClassPlans = default!;
-    public HashSet<string> CachePropertyNames = default!;
+    public readonly List<ClassPlan> ClassPlans = new();
+    public readonly HashSet<string> CachePropertyNames = new();
 
     public static OutputPlan Create(OutputModel outputModel)
     {
@@ -15,14 +15,30 @@ class OutputPlan
             CancellationToken = outputModel.CancellationToken,
             Context = outputModel.Context
         };
-        plan.ClassPlans = outputModel.Classes.Select(x => ClassPlan.Create(outputModel, x)).ToList();
+        var remainingClassModels = new HashSet<ClassModel>(outputModel.Classes);
+        var classPlansByModel = new Dictionary<ClassModel, ClassPlan>();
+        while (remainingClassModels.Count > 0)
+        {
+            foreach (var classModel in remainingClassModels.ToList())
+            {
+                if (classModel.SourceGeneratedBaseClass is not null &&
+                    remainingClassModels.Contains(classModel.SourceGeneratedBaseClass))
+                {
+                    continue;
+                }
+                var baseClassPlan = classModel.SourceGeneratedBaseClass is null ? null : classPlansByModel[classModel.SourceGeneratedBaseClass];
+                var classPlan = ClassPlan.Create(outputModel, classModel, baseClassPlan);
+                plan.ClassPlans.Add(classPlan);
+                classPlansByModel[classModel] = classPlan;
+                remainingClassModels.Remove(classModel);
+            }
+        }
         SetupCachePropertyNames(plan);
         return plan;
     }
 
     static void SetupCachePropertyNames(OutputPlan plan)
     {
-        plan.CachePropertyNames = new();
         foreach (var classPlan in plan.ClassPlans)
         {
             foreach (var field in classPlan.FieldPropertiesPlans)

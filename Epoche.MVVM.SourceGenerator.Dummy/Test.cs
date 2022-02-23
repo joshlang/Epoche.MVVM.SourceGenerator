@@ -9,10 +9,23 @@ using Epoche.MVVM.Models;
 
 namespace Epoche.MVVM.SourceGenerator.Dummy;
 
+interface IMeow<T> { }
+
+class SomeModel : ModelBase { }
+
 
 [UseSourceGen]
-partial class Test<T, U>: ViewModelBase
+abstract partial class Test<TBlarg, U>: ViewModelBase
+    where TBlarg: ModelBase
 {
+    [FactoryInitialize]
+    [Property]
+    TBlarg something;
+
     [Command]
     void Meow() { }
 }
+
+[UseSourceGen]
+partial class Test2 : Test<SomeModel, int> { }
+
