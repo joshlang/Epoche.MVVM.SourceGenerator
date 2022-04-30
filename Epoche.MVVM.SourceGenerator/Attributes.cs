@@ -61,12 +61,17 @@ sealed class WithFactoryAttribute : Attribute
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
 sealed class InjectAttribute : Attribute
 {
-    public Type Type { get; }
+    public Type? Type { get; }
+    public string? TypeName { get; }
     public string? Name { get; set; }
     public string? AccessModifier { get; set; }
     public InjectAttribute(Type type)
-    {
+    {   
         Type = type;
+    }
+    public InjectAttribute(string typeName)
+    {
+        TypeName = typeName;
     }
 }
 

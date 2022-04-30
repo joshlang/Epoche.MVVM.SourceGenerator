@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Epoche.MVVM.Models;
 using Epoche.MVVM.ViewModels;
-using Epoche.MVVM.SourceGenerator;
-using Epoche.MVVM.Models;
 
 namespace Epoche.MVVM.SourceGenerator.Dummy;
 
@@ -15,8 +9,10 @@ class SomeModel : ModelBase { }
 
 
 [UseSourceGen]
-abstract partial class Test<TBlarg, U>: ViewModelBase
-    where TBlarg: ModelBase
+[Inject(typeof(IMeow<string>), Name = "StringMeow")]
+[Inject("IMeow<TBlarg>", Name = "BlargMeow")]
+abstract partial class Test<TBlarg, U> : ViewModelBase
+    where TBlarg : ModelBase
 {
     [FactoryInitialize]
     [Property]

@@ -13,7 +13,8 @@ static class InjectAttributeModelBuilder
 
         if (!attributeData.ConstructorArguments.IsDefaultOrEmpty)
         {
-            model.Type = (attributeData.ConstructorArguments[0].Value as ITypeSymbol)?.ToDisplayString()!;
+            var arg = attributeData.ConstructorArguments[0].Value;
+            model.Type = (arg as ITypeSymbol)?.ToDisplayString() ?? (arg as string)!;
         }
         foreach (var named in attributeData.NamedArguments)
         {
@@ -21,6 +22,9 @@ static class InjectAttributeModelBuilder
             {
                 case "Type":
                     model.Type = (named.Value.Value as ITypeSymbol)?.ToDisplayString()!;
+                    break;
+                case "TypeName":
+                    model.Type = named.Value.Value as string ?? model.Type;
                     break;
                 case "Name":
                     model.Name = named.Value.Value as string;
