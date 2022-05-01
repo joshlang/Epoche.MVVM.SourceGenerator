@@ -15,11 +15,20 @@ abstract partial class Test<TBlarg, U> : ViewModelBase
     where TBlarg : ModelBase
 {
     [FactoryInitialize]
-    [Property]
+    [Property(OnChange = nameof(YaySomethingChanged))]
     TBlarg something;
+
+    [FactoryInitialize(InjectOnly = true)]
+    [Property]    
+    TBlarg? something2;
+
+    [ChangedBy(nameof(something))]
+    string? RandomThing { get; }
 
     [Command]
     void Meow() { }
+
+    void YaySomethingChanged() { }
 }
 
 [UseSourceGen]

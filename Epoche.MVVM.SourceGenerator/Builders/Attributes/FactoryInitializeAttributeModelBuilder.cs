@@ -25,6 +25,9 @@ static class FactoryInitializeAttributeModelBuilder
                 case "InitializeExpression":
                     model.InitializeExpression = named.Value.Value as string;
                     break;
+                case "InjectOnly":
+                    model.InjectOnly = named.Value.Value is bool ? (bool)named.Value.Value : model.InjectOnly;
+                    break;
             }
         }
 

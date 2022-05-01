@@ -5,4 +5,5 @@ class FactoryInitializeAttributeModel
 
     public string? Type;
     public string? InitializeExpression;
+    public bool InjectOnly;
 }

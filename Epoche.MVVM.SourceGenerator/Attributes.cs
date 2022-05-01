@@ -42,6 +42,7 @@ sealed class FactoryInitializeAttribute : Attribute
 {
     public Type? Type { get; set; }
     public string? InitializeExpression { get; set; }
+    public bool InjectOnly { get; set; }
     public FactoryInitializeAttribute(Type? type = null)
     {
         Type = type;

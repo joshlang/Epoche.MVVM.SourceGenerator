@@ -155,7 +155,7 @@ class ClassPlan
         foreach (var fieldModel in model.FieldModels.Where(x => x.FactoryInitializeAttribute is not null))
         {
             var type = GetFactoryInitializeType(fieldModel);
-            if (constructorArgTypes.Contains(type)) { continue; }
+            if (!constructorArgTypes.Add(type)) { continue; }
             plan.ConstructorArguments.Add(new ConstructorArg
             {
                 FullTypeName = type,
@@ -188,7 +188,7 @@ class ClassPlan
             }
         }
     }
-    static string GetFactoryInitializeType(FieldModel fieldModel) => $"Epoche.MVVM.Models.IModelFactory<{fieldModel.FullTypeName}>";
+    static string GetFactoryInitializeType(FieldModel fieldModel) => $"Epoche.MVVM.Models.IModelFactory<{fieldModel.FullTypeName.TrimEnd('?')}>";
     static void SetupCommands(ClassModel model, ClassPlan plan) => plan.CommandPlans = model.MethodModels.Where(x => x.CommandAttribute is not null).Select(x =>
     {
         var commandPlan = new CommandPlan
@@ -225,8 +225,8 @@ class ClassPlan
         EqualityComparer = x.PropertyAttribute.EqualityComparer.NullIfEmpty(),
         SetterModifier = x.PropertyAttribute.SetterModifier.NullIfEmpty(),
         TrackChanges = x.PropertyAttribute.TrackChanges,
-        FactoryConstructorArg = x.FactoryInitializeAttribute is null ? null : plan.ConstructorArgumentsByType[GetFactoryInitializeType(x)][0],
-        FactoryInitializerExpression = x.FactoryInitializeAttribute?.InitializeExpression.NullIfEmpty()
+        FactoryConstructorArg = x.FactoryInitializeAttribute is null || x.FactoryInitializeAttribute.InjectOnly ? null : plan.ConstructorArgumentsByType[GetFactoryInitializeType(x)][0],
+        FactoryInitializerExpression = x.FactoryInitializeAttribute is null || x.FactoryInitializeAttribute.InjectOnly ? null : x.FactoryInitializeAttribute.InitializeExpression.NullIfEmpty()
     }).ToList();
 
     static void SetupChangeBy(ClassModel model, ClassPlan plan)

@@ -13,21 +13,27 @@ static class FieldPropertyPlanWriter
         plan.IsReadOnly ? $" => this.{plan.FieldName};" : $@"
     {{
         get => this.{plan.FieldName};
-        {plan.SetterModifier.AddSpace()}set
+        {plan.SetterModifier.AddSpace()}set{(plan.AffectedProperties.Where(x => x != plan.PropertyName).Any() ? ConditionalSetter(plan) : SetterExpression(plan))}
+    }}
+";
+
+    static string ConditionalSetter(ClassPlan.FieldPropertyPlan plan) => $@"
         {{
-            if (this.Set(
+            if ({Set(plan)})
+            {{
+                {string.Concat(plan.AffectedProperties.Where(x => x != plan.PropertyName).Select(AffectedProperty)).Up()}
+            }}
+        }}";
+
+    static string SetterExpression(ClassPlan.FieldPropertyPlan plan) => $@" => {Set(plan)};";
+    
+    static string Set(ClassPlan.FieldPropertyPlan plan) => $@"this.Set(
                 ref this.{plan.FieldName}, 
                 value,
                 equalityComparer: {plan.EqualityComparer ?? "null"},
                 onChange: {plan.OnChange ?? "null"},
                 trackChanges: {(plan.TrackChanges ? "true" : "false")},
-                cachedPropertyChangedEventArgs: Epoche.MVVM.CachedPropertyChangeEventArgs.{plan.PropertyName}))
-            {{
-                {string.Concat(plan.AffectedProperties.Where(x => x != plan.PropertyName).Select(AffectedProperty)).Up()}
-            }}
-        }}
-    }}
-";
+                cachedPropertyChangedEventArgs: Epoche.MVVM.CachedPropertyChangeEventArgs.{plan.PropertyName})";
 
     static string AffectedProperty(string propertyName) => $@"
                 this.RaisePropertyChanged(Epoche.MVVM.CachedPropertyChangeEventArgs.{propertyName});";
